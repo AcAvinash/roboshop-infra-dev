@@ -12,7 +12,8 @@ terraform {
   key    = "roboshop-dev-catalogue"
   region         = "us-east-1"
   encrypt        = true
-  dynamodb_table = "terraform-locks-dev"
+  # dynamodb_table = "terraform-locks-dev"
+    use_lockfile = true
   }
 }
 
