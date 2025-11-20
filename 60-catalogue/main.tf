@@ -46,24 +46,22 @@ resource "terraform_data" "catalogue" {
     host     = aws_instance.catalogue.private_ip
   }
 
-provisioner "remote-exec" {
-inline = [
+  provisioner "remote-exec" {
+    inline = [
     "sudo yum install -y dos2unix",
     "sudo dos2unix /tmp/catalogue.sh",
     "chmod +x /tmp/catalogue.sh",
     "sudo /tmp/catalogue.sh catalogue ${var.environment}"
-  ]
-}
+    ]
+  }
 }
 
-# stopping the instance before creating AMI
 resource "aws_ec2_instance_state" "catalogue" {
   instance_id = aws_instance.catalogue.id
   state       = "stopped"
   depends_on = [terraform_data.catalogue]
 }
 
-# creating AMI from the instance
 resource "aws_ami_from_instance" "catalogue" {
   name               = "${var.project}-${var.environment}-catalogue"
   source_instance_id = aws_instance.catalogue.id
@@ -76,7 +74,6 @@ resource "aws_ami_from_instance" "catalogue" {
   )
 }
 
-# deleting the instance after creating AMI
 resource "terraform_data" "catalogue_delete" {
   triggers_replace = [
     aws_instance.catalogue.id
@@ -90,8 +87,11 @@ resource "terraform_data" "catalogue_delete" {
   depends_on = [aws_ami_from_instance.catalogue]
 }
 
+resource "random_id" "lt_suffix" {
+  byte_length = 4
+}
 resource "aws_launch_template" "catalogue" {
-  name = "${var.project}-${var.environment}-catalogue"
+   name = "${var.project}-${var.environment}-catalogue-${random_id.lt_suffix.hex}"
 
   image_id = aws_ami_from_instance.catalogue.id
   instance_initiated_shutdown_behavior = "terminate"
@@ -202,3 +202,11 @@ resource "aws_lb_listener_rule" "catalogue" {
     }
   }
 }
+
+
+
+
+
+
+
+
