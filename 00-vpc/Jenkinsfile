@@ -69,19 +69,17 @@ pipeline {
             }
         }
 
-        stage('Terraform Destroy') {
+      // Down stream job
+        stage('Trigger SG') {
             steps {
-                input message: "Should we Destroy the resources?", ok: "Yes", submitter: "admin,avinash"
                 script {
-                    withAWS(credentials: 'aws-cred', region: "${REGION}") {
-                        sh """
-                            cd 00-vpc
-                            terraform destroy -auto-approve
-                        """
-                    }
+                    build job: '10-sg', 
+                      propagate: false,  // even SG fails VPC will not be effected
+                      wait: false // VPC will not wait for SG pipeline completion
                 }
             }
         }
+
     }
 
     post { 
