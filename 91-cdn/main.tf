@@ -58,7 +58,7 @@ resource "aws_cloudfront_distribution" "roboshop" {
 
 resource "aws_route53_record" "frontend_alb" {
   zone_id = var.zone_id
-  name    = "cdn.${var.zone_name}" #dev.joindevops.fun.site
+  name    = "cdn.${var.zone_name}" #dev.joindevops.fun
   type    = "A"
 
   alias {
