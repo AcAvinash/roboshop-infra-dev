@@ -69,19 +69,7 @@ pipeline {
             }
         }
 
-        stage('Terraform Destroy') {
-            steps {
-                input message: "Should we Destroy the resources?", ok: "Yes", submitter: "admin,avinash"
-                script {
-                    withAWS(credentials: 'aws-cred', region: "${REGION}") {
-                        sh """
-                            cd 10-sg
-                            terraform destroy -auto-approve
-                        """
-                    }
-                }
-            }
-        }
+
     }
 
     post { 
