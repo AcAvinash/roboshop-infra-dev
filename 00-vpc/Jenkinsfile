@@ -1,7 +1,8 @@
 pipeline {
-    agent  {
+    agent {
         label 'AGENT-1'
     }
+
     environment { 
         appVersion = ''
         REGION = "us-east-1"
@@ -10,76 +11,75 @@ pipeline {
         COMPONENT = "catalogue"
         USERNAME = "acavinash"
     }
+
     options {
-        timeout(time: 30, unit: 'MINUTES') 
+        timeout(time: 30, unit: 'MINUTES')
         disableConcurrentBuilds()
-        ansicolor('xterm')
+        ansiColor('xterm')
     }
-    // parameters {
-    //     string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
-    //     text(name: 'BIOGRAPHY', defaultValue: '', description: 'Enter some information about the person')
-    //     booleanParam(name: 'TOGGLE', defaultValue: true, description: 'Toggle this value')
-    //     choice(name: 'CHOICE', choices: ['One', 'Two', 'Three'], description: 'Pick something')
-    //     password(name: 'PASSWORD', defaultValue: 'SECRET', description: 'Enter a password') 
-    // }
-    // Build
+
     stages {
-        stage('init') {
+        stage('Read package.json') {
             steps {
                 script {
-                  withAWS(credentials: 'aws-cred', region: "${REGION}") {
-                    sh """
-                    ls -ltr
-                     cd 00-vpc
-                     terraform init -reconfigure
-
-                    """
-
-                  }
+                    def packageJson = readJSON file: 'package.json'
+                    appVersion = packageJson.version
+                    echo "Package version: ${appVersion}"
                 }
             }
         }
 
-        stage('plan') {
+        stage('Terraform Init') {
             steps {
-                  withAWS(credentials: 'aws-cred', region: "${REGION}") {
-                    sh """
-                     cd 00-vpc
-                     terraform plan
-
-                    """
-
-                  }
+                script {
+                    withAWS(credentials: 'aws-cred', region: "${REGION}") {
+                        sh """
+                            cd 00-vpc
+                            terraform init -reconfigure
+                        """
+                    }
+                }
             }
         }
 
-        stage('apply') {
-          input {
-            message "should we continue?"
-            ok "Yes, we should"
-            submitter "admin,avinash"
-          }
-                  withAWS(credentials: 'aws-cred', region: "${REGION}") {
-                    sh """
-                     cd 00-vpc
-                     terraform apply -auto-approve
+        stage('Terraform Plan') {
+            steps {
+                script {
+                    withAWS(credentials: 'aws-cred', region: "${REGION}") {
+                        sh """
+                            cd 00-vpc
+                            terraform plan
+                        """
+                    }
+                }
+            }
+        }
 
-                    """
-
-                  }
+        stage('Terraform Apply') {
+            steps {
+                input message: "Should we continue with Terraform Apply?", ok: "Yes", submitter: "admin,avinash"
+                script {
+                    withAWS(credentials: 'aws-cred', region: "${REGION}") {
+                        sh """
+                            cd 00-vpc
+                            terraform apply -auto-approve
+                        """
+                    }
+                }
+            }
         }
     }
 
     post { 
         always { 
-            echo 'I will always say Hello again!'
+            echo 'Cleaning workspace...'
             deleteDir()
         }
         success { 
-            echo 'Hello Success'
+            echo 'Pipeline completed successfully!'
         }
         failure { 
-            echo 'Hello Failure'
+            echo 'Pipeline failed!'
         }
     }
 }
