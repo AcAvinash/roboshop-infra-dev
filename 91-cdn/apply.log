@@ -1,0 +1,126 @@
+Acquiring state lock. This may take a few moments...
+[0m[1mdata.aws_cloudfront_cache_policy.cacheDisable: Reading...[0m[0m
+[0m[1mdata.aws_ssm_parameter.acm_certificate_arn: Reading...[0m[0m
+[0m[1mdata.aws_cloudfront_cache_policy.cacheEnable: Reading...[0m[0m
+[0m[1mdata.aws_ssm_parameter.frontend_alb_listener_arn: Reading...[0m[0m
+[0m[1mdata.aws_ssm_parameter.acm_certificate_arn: Read complete after 2s [id=/roboshop/dev/acm_certificate_arn][0m
+[0m[1mdata.aws_ssm_parameter.frontend_alb_listener_arn: Read complete after 2s [id=/roboshop/dev/frontend_alb_listener_arn][0m
+[0m[1mdata.aws_cloudfront_cache_policy.cacheDisable: Read complete after 2s [id=4135ea2d-6df8-44a3-9df3-4b5a84be39ad][0m
+[0m[1mdata.aws_cloudfront_cache_policy.cacheEnable: Read complete after 2s [id=658327ea-f89d-4fab-a63d-7e88639e58f6][0m
+[0m[1maws_cloudfront_distribution.roboshop: Refreshing state... [id=E37M9LR7ZADP4D][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [32m+[0m create[0m
+  [33m~[0m update in-place[0m
+
+Terraform will perform the following actions:
+
+[1m  # aws_cloudfront_distribution.roboshop[0m will be updated in-place
+[0m  [33m~[0m[0m resource "aws_cloudfront_distribution" "roboshop" {
+      [33m~[0m[0m aliases                         = [
+          [31m-[0m[0m "static.joindevops.fun",
+          [32m+[0m[0m "cdn.joindevops.fun",
+        ]
+        id                              = "E37M9LR7ZADP4D"
+        tags                            = {
+            "Environment" = "dev"
+            "Name"        = "roboshop-dev"
+            "Project"     = "roboshop"
+            "Terraform"   = "true"
+        }
+        [90m# (21 unchanged attributes hidden)[0m[0m
+
+      [33m~[0m[0m default_cache_behavior {
+          [33m~[0m[0m target_origin_id           = "static.joindevops.fun" [33m->[0m[0m "cdn.joindevops.fun"
+            [90m# (15 unchanged attributes hidden)[0m[0m
+
+            [90m# (1 unchanged block hidden)[0m[0m
+        }
+
+      [33m~[0m[0m ordered_cache_behavior {
+          [33m~[0m[0m target_origin_id           = "static.joindevops.fun" [33m->[0m[0m "cdn.joindevops.fun"
+            [90m# (16 unchanged attributes hidden)[0m[0m
+
+            [90m# (1 unchanged block hidden)[0m[0m
+        }
+
+      [31m-[0m[0m origin {
+          [31m-[0m[0m connection_attempts      = 3 [90m-> null[0m[0m
+          [31m-[0m[0m connection_timeout       = 10 [90m-> null[0m[0m
+          [31m-[0m[0m domain_name              = "static.joindevops.fun" [90m-> null[0m[0m
+          [31m-[0m[0m origin_id                = "static.joindevops.fun" [90m-> null[0m[0m
+            [90m# (2 unchanged attributes hidden)[0m[0m
+
+          [31m-[0m[0m custom_origin_config {
+              [31m-[0m[0m http_port                = 80 [90m-> null[0m[0m
+              [31m-[0m[0m https_port               = 443 [90m-> null[0m[0m
+              [31m-[0m[0m origin_keepalive_timeout = 5 [90m-> null[0m[0m
+              [31m-[0m[0m origin_protocol_policy   = "https-only" [90m-> null[0m[0m
+              [31m-[0m[0m origin_read_timeout      = 30 [90m-> null[0m[0m
+              [31m-[0m[0m origin_ssl_protocols     = [
+                  [31m-[0m[0m "TLSv1.2",
+                ] [90m-> null[0m[0m
+            }
+        }
+      [32m+[0m[0m origin {
+          [32m+[0m[0m connection_attempts      = 3
+          [32m+[0m[0m connection_timeout       = 10
+          [32m+[0m[0m domain_name              = "cdn.joindevops.fun"
+          [32m+[0m[0m origin_id                = "cdn.joindevops.fun"
+            [90m# (2 unchanged attributes hidden)[0m[0m
+
+          [32m+[0m[0m custom_origin_config {
+              [32m+[0m[0m http_port                = 80
+              [32m+[0m[0m https_port               = 443
+              [32m+[0m[0m origin_keepalive_timeout = 5
+              [32m+[0m[0m origin_protocol_policy   = "https-only"
+              [32m+[0m[0m origin_read_timeout      = 30
+              [32m+[0m[0m origin_ssl_protocols     = [
+                  [32m+[0m[0m "TLSv1.2",
+                ]
+            }
+        }
+
+      [33m~[0m[0m restrictions {
+          [33m~[0m[0m geo_restriction {
+              [33m~[0m[0m locations        = [
+                  [31m-[0m[0m "IR",
+                  [31m-[0m[0m "KP",
+                  [32m+[0m[0m "CA",
+                  [32m+[0m[0m "DE",
+                  [32m+[0m[0m "GB",
+                  [32m+[0m[0m "US",
+                ]
+              [33m~[0m[0m restriction_type = "blacklist" [33m->[0m[0m "whitelist"
+            }
+        }
+
+        [90m# (1 unchanged block hidden)[0m[0m
+    }
+
+[1m  # aws_route53_record.frontend_alb[0m will be created
+[0m  [32m+[0m[0m resource "aws_route53_record" "frontend_alb" {
+      [32m+[0m[0m allow_overwrite = (known after apply)
+      [32m+[0m[0m fqdn            = (known after apply)
+      [32m+[0m[0m id              = (known after apply)
+      [32m+[0m[0m name            = "cdn.joindevops.fun"
+      [32m+[0m[0m type            = "A"
+      [32m+[0m[0m zone_id         = "Z0005065ZXFJMJERYTTP"
+
+      [32m+[0m[0m alias {
+          [32m+[0m[0m evaluate_target_health = true
+          [32m+[0m[0m name                   = "dtfnpq0har8n8.cloudfront.net"
+          [32m+[0m[0m zone_id                = "Z2FDTNDATAQYW2"
+        }
+    }
+
+[1mPlan:[0m 1 to add, 1 to change, 0 to destroy.
+[0m[0m[1m
+Do you want to perform these actions?[0m
+  Terraform will perform the actions described above.
+  Only 'yes' will be accepted to approve.
+
+  [1mEnter a value:[0m [0m
+[0m[1maws_cloudfront_distribution.roboshop: Modifying... [id=E37M9LR7ZADP4D][0m[0m
+Releasing state lock. This may take a few moments...
